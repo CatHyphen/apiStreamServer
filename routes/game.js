@@ -5,24 +5,67 @@ const mongoose =require('mongoose');
 const utils = require('../utils');
 const responses =require('../responses');
 const protectRoute = require('../middlewares/protectRoute');
-
+const checkJwt = require('../middlewares/checkJwt');
 
 //Get all Games
 router.get('/', (req, res)=>{
-  Game.find({})
-    .then((Game)=>{
-        res.status(responses.status.OK).send({Game});
+  Game.find({}).sort({Views: -1})
+    .then((game)=>{
+        res.status(responses.status.OK).send(game);
     })
     .catch(err=>{
       res.status(responses.status.BadRequest).send({error:err});
     });
 });
+//Get  Games with name like
+router.get('/islike/:name', (req, res)=>{
+  if(req.params.name){
+    Game.find({FullName:{ $regex: '.*' + req.params.name + '.*' }})
+    .then((game)=>{
+        res.status(responses.status.OK).send(game);
+    })
+    .catch(err=>{
+      res.status(responses.status.BadRequest).send({error:err});
+    });
+ 
+  }
+});
+//Get  Games with name like
+router.get('/:name', (req, res)=>{
+  
+  if(req.params.name){
+    Game.findOne({FullName: req.params.name })
+    .then((game)=>{
+        res.status(responses.status.OK).send(game);
+    })
+    .catch(err=>{
+      res.status(responses.status.BadRequest).send({error:err});
+    });
+ 
+  }
+});
 //get Game by Id
-router.get('/:id', (req, res)=>{
+router.get('/game_id/:id', (req, res)=>{
+
   if(req.params.id){
-      Game.findById(req.params.id)
+      Game.findOne({_id:req.params.id})
         .then((game)=>{
-            res.status(responses.status.OK).send({game});
+            res.status(responses.status.OK).send(game);
+        })
+        .catch(err=>{
+          res.status(responses.status.BadRequest).send({error:err});
+        });
+  }
+  else{
+    res.status(responses.status.BadRequest).send({err:responses.Error.IdNotFound});
+  }
+});
+//get Game by Type
+router.get('/type/:id', (req, res)=>{
+  if(req.params.id){
+      Game.find({Type:{$elemMatch: {_id:req.params.id}}})
+        .then((game)=>{
+            res.status(responses.status.OK).send(game);
         })
         .catch(err=>{
           res.status(responses.status.BadRequest).send({error:err});
@@ -33,8 +76,11 @@ router.get('/:id', (req, res)=>{
   }
 });
 
+
+
+
 // Create Game
-router.post('/',protectRoute,(req,res)=>{
+router.post('/',checkJwt,protectRoute,(req,res)=>{
  
       if(utils.checkValidString(req.body) ){
             const Ngame = new Game({
@@ -60,34 +106,9 @@ router.post('/',protectRoute,(req,res)=>{
       }
   
 });
-/* Increase views
-* @params(id)
-*/
-router.post('/inc/:id',(req,res)=>{
-  if(req.params.id)
-  {
-    console.log(req.params.id)
-      Game.findById(req.params.id, (err,game)=>{
-        if(err){
-          res.status(responses.status.BadRequest).send({err:err._message});
-        } 
-        else{
-          game.Views = game.Views + 1;
-          game.save().then(resolve=>{
-            if(resolve) res.status(responses.status.OK).send({msg:'Increased'})
-          })
-        }     
-        
-       
-      });
-      
-  }
-  else{
-    res.status(responses.status.BadRequest).send({err:responses.Error.IdNotFound});
-};
-});
+
 //Update Game
-router.patch('/:id',protectRoute,(req,res)=>{
+router.patch('/:id',checkJwt,protectRoute,(req,res)=>{
 
   
   if(req.params.id){
@@ -116,7 +137,7 @@ router.patch('/:id',protectRoute,(req,res)=>{
   }
 });
 //Delete Game
-router.delete('/:id',protectRoute, (req, res)=>{
+router.delete('/:id',checkJwt,protectRoute, (req, res)=>{
   if(req.params.id){
       Game.findById(req.params.id,(err,Game)=>{
         if(err) res.status(responses.status.BadRequest).send({error:err});
@@ -128,6 +149,35 @@ router.delete('/:id',protectRoute, (req, res)=>{
     res.status(responses.status.BadRequest).send({err:responses.Error.IdNotFound});
   }
 });
-
+/* Increase views
+* @params(id)
+*/
+router.post('/increase/:id',(req,res)=>{
+  if(req.params.id)
+  {
+      
+      Game.findOne({_id:req.params.id},(err,game)=>{
+        
+          let view = game.Views;
+          
+       
+      
+          game.Views = view + 1;
+          game.save((err,g)=>{
+            if(err) res.status(responses.status.BadRequest).send({err});
+            if(g){
+              res.status(responses.status.OK).send({msg:"Increase"});
+            }
+          })
+          
+        
+       
+      });
+      
+  }
+  else{
+    res.status(responses.status.BadRequest).send({err:responses.Error.IdNotFound});
+};
+});
 
 module.exports = router

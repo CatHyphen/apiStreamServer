@@ -1,26 +1,25 @@
 const express = require('express')
 const router = express.Router()
-const Account = require('../../models/account');
+const Channel = require('../../models/channel');
 const jwt =  require('jsonwebtoken');
 const config = require('../../config');
 const utils = require('../../utils');
 const responses = require('../../responses');
 router.post('/login', (req, res) => {
-  console.log(req.body.user)
-  Account.findOne({
-    Username: req.body.user.username
-  }, (err, acc) => {
+
+
+  Channel.findOne({Username: req.body.username} ,(err, channel) => {
 
     if (err) res.status(responses.status.BadRequest).send({err:responses.Error.UserNamePassWordNotFound}) ;
 
-    if (!acc) {
+    if (!channel) {
       res.status(responses.status.NotFound).json({
-        message: responses.Error.UserNamePassWordNotFound
+        message: responses.Error.WrongPassword
       });
-    } else if (acc) {
+    } else if (channel) {
 
      
-      if (acc.Password != utils.encrypt(req.body.user.password)) {
+      if (channel.Password != utils.encrypt(req.body.password)) {
         res.status(responses.status.NotFound).json({
           success: false,
           message: responses.Error.UserNamePassWordNotFound
@@ -29,13 +28,14 @@ router.post('/login', (req, res) => {
 
           
           
-          var token = jwt.sign(createPayload(acc), config.secretKey, {
+          var token = jwt.sign(createPayload(channel), config.secretKey, {
             expiresIn: 60*60*24 
             });
             res.status(responses.status.OK).json({
                 success: true,
                 message: 'Woa la, BPhone is about to release!',
-                token: token
+                token: token,
+                username:channel.Username
             });
         
 
@@ -49,23 +49,21 @@ router.post('/login', (req, res) => {
 
 });
 
-function createPayload(account){
-  if(account.Roles =="Admin")
+function createPayload(channel){
+  if(channel.Roles =="Admin")
           {
-            console.log(account.Roles);
+            console.log(channel.Roles);
             return payload = {
               "UserId":account._id,
               "Admin":true,
-              "Username":account.Username,
-              "Password":account.Password
+              "Username":channel.Username
           };
             
           }
          return payload = {
-              "UserId":account._id,
+              "UserId":channel._id,
               "Admin":false,
-              "Username":account.Username,
-              "Password":account.Password
+              "Username":channel.Username
           };
 }
 module.exports = router

@@ -25,12 +25,15 @@ module.exports = {
   },
   Error:{
     EmailIncorrectFormated: "The email(s) information field you provided, seems not to be an correct email!",
+    EmailAlreadyExisted:"Email allready existed!",
     PasswordNotMatch: " The password that you entered is not correct or belongs to another email!",
     MissingField:"The information you provided is missing somethings!",
     IdNotFound:"The id of the account you provided is not a existed one or missing charactors!",
     UserNamePassWordNotFound:"The username or password is not correct! ",
     PermisionDenied:"Permision denied! You are not allow to do this!",
     UsernameAlreadyExisted: "Username Already Existed",
+    UserNotFound:"User Not Found!",
+    WrongPassword:"Wrong password",
   },
   Message:{
     SuccessfulDeleted:"Delete Successfully"

@@ -7,9 +7,9 @@ const utils = require('../utils');
 
 //Get all Languages
 router.get('/', (req, res)=>{
-  Language.find({})
+  Language.find({}).sort({NativeName:  1})
     .then((lang)=>{
-        res.status(responses.status.OK).send({lang});
+        res.status(responses.status.OK).send(lang);
     })
     .catch(err=>{
       res.status(responses.status.BadRequest).send({error:err});

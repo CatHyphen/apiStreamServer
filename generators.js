@@ -3,7 +3,8 @@ module.exports = {
 
   
   streamKeygen : (id)=>{
-    return utils.encrypt(id);
+    let now = Date.now();
+    return utils.encrypt(id+now);
   }
 
 }

@@ -6,27 +6,48 @@ const ChannelSchema = new Schema({
   _id: {
     type:ObjectId
   },
-  Id_Account: {
+  Email: {
     type:String,
     required:true,
-    unique:true
   },
-  Display_Name:{
+  Username:{
     type:String,
+    required:true
+  },
+  Password:{
+    type:String,
+    required:true
+  },
+  Roles:{
+    type:String,
+    default:"User"
+  },
+  DateOfBirth:{
+    type:Date,
     required:true
   },
   BroadCast_Path:{
     type:String,
-    required:true
+    default:''
+  },
+  StreamKey: {
+    type:String,
+    required:true,
+    unique:true
   },
   Bio:{
-    type:String
+    type:String,
+    default:''
   },
   Profile_Picture:{
     type:String,
     required:true
   },
   Profile_Banner:{
+    type:String,
+    required:true
+  },
+  VideoPlayer_Banner:{
     type:String,
     required:true
   },
@@ -38,32 +59,41 @@ const ChannelSchema = new Schema({
     type:Boolean,
     required:true
   },
-  Followers:{
+  Views:{
     type:Number,
-    required:true
+    default:0
+  },
+  Friends:{
+    type:Array,
+    default:[]
+  },
+  Followers:{
+    type:Array,
+    default:[]
   },
   Followings:{
-    type:Number,
-    required:true
+    type:Array,
+    default:[]
   },
   Live_Title:{
     type:String,
-    required:true
+    default:''
   },
   Go_Live_Notification:{
-    type:String
+    type:String,
+    default:''
   },
-  Category:{
-    type:Array,
-    required:true
+  Current_Streaming_Game:{
+    type:String,
+    default:''
   },
   Tags:{
     type:Array,
-    required:true
+    default:[]
   },
   Language:{
-    type:ObjectId,
-    required:true
+    type:String,
+    default:''
   },
   CreatedAt:{
     type:Date,
@@ -75,8 +105,5 @@ const ChannelSchema = new Schema({
   }
 });
 
-ChannelSchema.methods.getById=(id,cb)=>{
-  return this.model('Channel').findById(id,cb);
-};
 
 module.exports = mongoose.model('Channel',ChannelSchema);

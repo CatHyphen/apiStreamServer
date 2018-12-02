@@ -15,7 +15,22 @@ router.get('/', (req, res)=>{
       res.status(responses.status.BadRequest).send({error:err});
     });
 });
-
+//Get by id GameTypes
+router.get('/:id', (req, res)=>{
+  if(req.params.id){
+    GameType.findById(req.params.id)
+    .then((game_type)=>{
+        res.status(responses.status.OK).send(game_type);
+    })
+    .catch(err=>{
+      res.status(responses.status.BadRequest).send({error:err});
+    });
+  }
+  else{
+    res.status(responses.status.BadRequest).send({error:responses.Error.IdNotFound});
+  }
+  
+});
 
 // Create GameType
 router.post('/',(req,res)=>{   

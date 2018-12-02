@@ -1,21 +1,23 @@
 const express = require('express')
 const router = express.Router();
-const Account = require('../models/account');
+const Channel = require('../models/channel');
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 
 router.use((req,res,next)=>{
   var token = req.body.token || req.query.token || req.headers['x-access-token'];
-
   // decode token
   if (token) {
 
+    console.log(token)
     jwt.verify(token, config.secretKey, function(err, decoded) {      
       if (err) {
         return res.json({err: 'Failed to authenticate token.' });    
       } else {
-        Account.findOne({Username:decoded.Username,Password:decoded.Password}).then(acc=>{
-          if(acc) 
+
+        console.log(decoded)
+        Channel.findOne({Username:decoded.Username}).then(channel=>{
+          if(channel) 
           {       
             req.decoded = decoded; 
             next();

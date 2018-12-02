@@ -19,14 +19,11 @@ module.exports ={
   
   },
   checkValidString:(Args)=>{
-    let valid =false;
-    console.log(Args)
-    console.log(_.isEmpty(Args))
-
+    
+    let valid =false;    
     if(!_.isEmpty(Args))
     {
       _.forOwn(Args, function(value, key) {
-          console.log(key);
           // let reg = server_config.StringRegex;
           // if(value) valid= reg.test(String(value).toLocaleLowerCase());
           if(value) valid = true;
